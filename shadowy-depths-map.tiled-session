@@ -1,0 +1,42 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "assets/depths-level.tmj",
+    "expandedProjectPaths": [
+    ],
+    "fileStates": {
+        "": {
+            "scaleInDock": 3
+        },
+        "assets/depths-level.tmj": {
+            "scale": 3,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 122,
+                "y": 772
+            }
+        },
+        "assets/depths-level.tmj#tiles": {
+            "scaleInDock": 1.5
+        }
+    },
+    "last.imagePath": "C:/Users/derpk/CMPM120/Shadowy Depths/assets",
+    "map.height": 120,
+    "map.lastUsedFormat": "json",
+    "map.tileHeight": 8,
+    "map.tileWidth": 8,
+    "openFiles": [
+        "assets/depths-level.tmj"
+    ],
+    "project": "shadowy-depths-map.tiled-project",
+    "recentFiles": [
+        "assets/depths-level.tmj"
+    ],
+    "tileset.embedInMap": true,
+    "tileset.tileSize": {
+        "height": 8,
+        "width": 8
+    }
+}

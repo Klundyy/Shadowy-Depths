@@ -22,18 +22,18 @@ class Load extends Phaser.Scene {
         // kenny-particles.json internally has a list of the png files
         // The multiatlas was created using TexturePacker and the Kenny
         // Particle Pack asset pack.
-        this.load.multiatlas("kenny-particles", "kenny-particles.json");
-        this.load.audio('coinAudio',['Collectibles_2.wav']);
-        this.load.audio('keyAudio',['Collectibles_6.wav']);
-        this.load.audio('jumpAudio',['Bounce_3.wav']);
-        this.load.image('walk1','Player_Knight_walk_1.png');
-        this.load.image('walk2','Player_Knight_walk_2.png');
-        this.load.image('walk3','Player_Knight_walk_3.png');
-        this.load.image('walk4','Player_Knight_walk_4.png');
-        this.load.image('idle1','Player_Knight_idle_1.png');
-        this.load.image('idle2','Player_Knight_idle_2.png');
-        this.load.image('idle3','Player_Knight_idle_3.png');
-        this.load.image('idle4','Player_Knight_idle_4.png');
+        // this.load.multiatlas("kenny-particles", "kenny-particles.json");
+        // this.load.audio('coinAudio',['Collectibles_2.wav']);
+        // this.load.audio('keyAudio',['Collectibles_6.wav']);
+        // this.load.audio('jumpAudio',['Bounce_3.wav']);
+        this.load.image('walk1','Player_Knight_walk_0.png');
+        this.load.image('walk2','Player_Knight_walk_1.png');
+        this.load.image('walk3','Player_Knight_walk_2.png');
+        this.load.image('walk4','Player_Knight_walk_3.png');
+        this.load.image('idle1','Player_Knight_idle_0.png');
+        this.load.image('idle2','Player_Knight_idle_1.png');
+        this.load.image('idle3','Player_Knight_idle_2.png');
+        this.load.image('idle4','Player_Knight_idle_3.png');
     }
 
     create() {
@@ -43,7 +43,7 @@ class Load extends Phaser.Scene {
                 {key: 'walk1'},
                 {key: 'walk2'},
                 {key: 'walk3'},
-                {key: 'walk4'}
+                {key: 'walk4', duration: 50 }
             ],
             frameRate: 15,
             repeat: -1
@@ -55,7 +55,7 @@ class Load extends Phaser.Scene {
                 {key: 'idle1'},
                 {key: 'idle2'},
                 {key: 'idle3'},
-                {key: 'idle4'}
+                {key: 'idle4', duration: 50 }
             ],
             frameRate: 15,
             repeat: -1
@@ -63,10 +63,10 @@ class Load extends Phaser.Scene {
 
         this.anims.create({
             key: 'jump',
-            defaultTextureKey: "platformer_characters",
             frames: [
-                { frame: "tile_0001.png" }
+                { key: 'walk2' }
             ],
+
         });
 
          // ...and pass to the next Scene

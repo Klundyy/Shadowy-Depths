@@ -5,12 +5,16 @@ class Platformer extends Phaser.Scene {
 
     init() {
         // variables and settings
-        this.ACCELERATION = 200;
-        this.DRAG = 1000;    // DRAG < ACCELERATION = icy slide
+        this.ACCELERATION = 500;
+        this.DRAG = 600;    // DRAG < ACCELERATION = icy slide
         this.physics.world.gravity.y = 500;
-        this.JUMP_VELOCITY = -600;
+        this.MAX_X_VEL = 50;
+        this.MAX_Y_VEL = 200;
+        this.JUMP_VELOCITY = -160;
         this.PARTICLE_VELOCITY = 50;
         this.SCALE = 1;
+        this.jumpStartTime;
+        this.isJumping;
     }
     preload(){
         this.load.scenePlugin('AnimatedTiles', './lib/AnimatedTiles.js', 'animatedTiles', 'animatedTiles');
@@ -20,13 +24,10 @@ class Platformer extends Phaser.Scene {
         this.roomGen = false;
         this.map = this.add.tilemap("depths-level", 8, 8);
 
-        // Add a tileset to the map
-        // First parameter: name we gave the tileset in Tiled
-        // Second parameter: key for the tilesheet (from this.load.image in Load.js)
+        // Tileset
         this.tileset = this.map.addTilesetImage("tiles", "tilemap_tiles");
 
-        // Create a layer
-        
+        // Layers
         this.backgroundLayer = this.map.createLayer("Background", this.tileset, 0, 0).setScale(this.SCALE);
         this.groundLayer = this.map.createLayer("Ground", this.tileset, 0, 0).setScale(this.SCALE);
         //this.objectLayer = this.map.createLayer("Objects", this.tileset, 0, 0);
@@ -48,18 +49,20 @@ class Platformer extends Phaser.Scene {
         // this.lockGroup = this.add.group(this.lock);
 
         // Player Avatar
-        my.sprite.player = this.physics.add.sprite(0, 250, "Player_Knight_idle_0.png").setScale(this.SCALE);
+        my.sprite.player = this.physics.add.sprite(116, 892, "Player_Knight_idle_0.png").setScale(this.SCALE);
         my.sprite.player.setSize(8,8);
         my.sprite.player.setOffset(8,8);
         my.sprite.player.setCollideWorldBounds(true);
-        my.sprite.player.setMaxVelocity(50, 200);
+        my.sprite.player.setMaxVelocity(this.MAX_X_VEL, this.MAX_Y_VEL);
         my.sprite.player.coins = 0;
         my.sprite.player.collectibles = 0;
+        // Physics World Properties
         this.physics.world.setBounds(0,0,240,900);
+        this.physics.world.TILE_BIAS = 24;
 
         // Collision handling
         this.physics.add.collider(my.sprite.player, this.groundLayer, null,(obj1, obj2) => {
-            if(obj2.properties.collideDown){
+            if(obj2.properties.collideDown){ // One sided collision check during process callback (If using the collide callback, collision already happens resulting in velocty being 0)
                 if (obj1.body.velocity.y >= 0) {
                     return true;
                 } else {
@@ -157,10 +160,20 @@ class Platformer extends Phaser.Scene {
             // my.vfx.jumping.stop();
         }
         if(my.sprite.player.body.blocked.down && cursors.up.isDown) {
-            my.sprite.player.body.setVelocityY(this.JUMP_VELOCITY);
+            if(!this.isJumping){
+                this.jumpStartTime = this.time.now; // Jump starting hold time
+                this.isJumping = true;
+            }
             // this.sound.play('jumpAudio');
             // my.vfx.jumping.startFollow(my.sprite.player, my.sprite.player.displayWidth/2-10, my.sprite.player.displayHeight/2-5, false);
             // my.vfx.jumping.start();
+        }
+        if(my.sprite.player.body.blocked.down && cursors.up.isUp && this.isJumping){
+            const jumpTime = this.time.now-this.jumpStartTime; // Jump hold duration
+            let jumpForce = jumpTime * .1;
+            jumpForce = (jumpForce > 50) ? 50 : jumpForce;  // Setting max jump force
+            my.sprite.player.body.setVelocityY(this.JUMP_VELOCITY-jumpForce);
+            this.isJumping = false;
         }
         if(Phaser.Input.Keyboard.JustDown(this.rKey)) {
             this.scene.restart();

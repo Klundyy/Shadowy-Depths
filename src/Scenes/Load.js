@@ -64,7 +64,7 @@ class Load extends Phaser.Scene {
         this.anims.create({
             key: 'jump',
             frames: [
-                { key: 'walk2' }
+                { key: 'walk1' }
             ],
 
         });

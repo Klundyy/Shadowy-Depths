@@ -11,15 +11,15 @@
             "scaleInDock": 3
         },
         "assets/depths-level.tmj": {
-            "scale": 3,
+            "scale": 2,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 122,
-                "y": 772
+                "x": 68,
+                "y": 501
             }
         },
         "assets/depths-level.tmj#tiles": {
-            "scaleInDock": 1.5
+            "scaleInDock": 2
         }
     },
     "last.imagePath": "C:/Users/derpk/CMPM120/Shadowy Depths/assets",

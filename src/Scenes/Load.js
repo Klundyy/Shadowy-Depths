@@ -8,7 +8,8 @@ class Load extends Phaser.Scene {
         // Load characters spritesheet
 
         // Load tilemap information
-        this.load.image("tilemap_tiles", "tiles.png");                         // Packed tilemap
+        this.load.image("tilemap_tiles", "tiles.png");        // Packed tilemap
+        this.load.image("movingPlatform", "movingPlatform.png");    // moving platform sprite
         this.load.tilemapTiledJSON("depths-level", "depths-level.tmj");   // Tilemap in JSON
         this.load.bitmapFont("rocketSquare", "KennyRocketSquare_0.png", "KennyRocketSquare.fnt");
         // Load the tilemap as a spritesheet

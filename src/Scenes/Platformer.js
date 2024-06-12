@@ -15,6 +15,8 @@ class Platformer extends Phaser.Scene {
         this.SCALE = 1;
         this.jumpStartTime;
         this.isJumping;
+        this.inGameTime = 0;
+        this.playerHeight;
     }
     preload(){
         this.load.scenePlugin('AnimatedTiles', './lib/AnimatedTiles.js', 'animatedTiles', 'animatedTiles');
@@ -30,26 +32,31 @@ class Platformer extends Phaser.Scene {
         // Layers
         this.backgroundLayer = this.map.createLayer("Background", this.tileset, 0, 0).setScale(this.SCALE);
         this.groundLayer = this.map.createLayer("Ground", this.tileset, 0, 0).setScale(this.SCALE);
-        //this.objectLayer = this.map.createLayer("Objects", this.tileset, 0, 0);
+        this.objectLayer = this.map.createLayer("Objects", this.tileset, 0, 0);
         this.animatedTiles.init(this.map);
         this.groundLayer.setCollisionByProperty({
             collides: true
         });
 
-        // this.coins = this.map.createFromObjects("Objects", {
-        //     name: "coin",
-        //     key: "tilemap_sheet",
-        //     frame: 151
-        // });
+        this.signs = this.map.createFromObjects("Objects", {
+            name: "sign",
+            key: "tilemap_sheet",
+            frame: 308
+        });
+        this.flag = this.map.createFromObjects("Objects", {
+            name: "flag",
+            key: "tilemap_sheet",
+            frame: 22
+        })
         // Static Objects
-        //this.physics.world.enable(this.coins, Phaser.Physics.Arcade.STATIC_BODY);
+        this.physics.world.enable(this.signs, Phaser.Physics.Arcade.STATIC_BODY);
+        this.physics.world.enable(this.flag, Phaser.Physics.Arcade.STATIC_BODY);
 
         // Object Groups
-        // this.coinGroup = this.add.group(this.coins);
-        // this.lockGroup = this.add.group(this.lock);
+        this.signGroup = this.add.group(this.signs);
 
         // Player Avatar
-        my.sprite.player = this.physics.add.sprite(116, 892, "Player_Knight_idle_0.png").setScale(this.SCALE);
+        my.sprite.player = this.physics.add.sprite(8, 880, "Player_Knight_idle_0.png").setScale(this.SCALE);
         my.sprite.player.setSize(8,8);
         my.sprite.player.setOffset(8,8);
         my.sprite.player.setCollideWorldBounds(true);
@@ -71,19 +78,29 @@ class Platformer extends Phaser.Scene {
             }
             return true;
         });
+        // Moving platforms setup
+        this.movingPlatform1 = this.physics.add.sprite(88, 496, 'movingPlatform').setDisplaySize(16,16); // Set up sprite and size for moving platform
+        this.movingPlatform1.body.setAllowGravity(false); // Platform can float
+        this.movingPlatform1.body.setImmovable(true);   // 
+        this.movingPlatform1.body.velocity.x = 25;
+        this.physics.add.collider(my.sprite.player, this.movingPlatform1);
+        this.movingPlatform2 = this.physics.add.sprite(160, 352, 'movingPlatform').setDisplaySize(16,16); // Set up sprite and size for moving platform
+        this.movingPlatform2.body.setAllowGravity(false); // Platform can float
+        this.movingPlatform2.body.setImmovable(true);   // 
+        this.movingPlatform2.body.velocity.y = 25;
+        this.physics.add.collider(my.sprite.player, this.movingPlatform2);
         // Overlap Handling
-        // this.physics.add.overlap(my.sprite.player, this.coinGroup, (obj1, obj2) => {
-        //     my.sprite.player.coins += 1;
-        //     this.sound.play('coinAudio');
-        //     this.map.removeTileAtWorldXY(obj2.x, obj2.y);
-        //     obj2.destroy();
-        // });
-        // this.physics.add.overlap(my.sprite.player, this.flag, (obj1, obj2) => {
-        //     this.scene.start("winScreen", my.sprite.player.collectibles);
-        // });
+        this.physics.add.overlap(my.sprite.player, this.signGroup, (obj1, obj2) => {
+            this.signText = this.add.bitmapText(obj2.x, obj2.y + 12, "rocketSquare", "Press E", 8, 1).setOrigin(0.5).setScale(.5);
+        });
+        this.physics.add.overlap(my.sprite.player, this.flag, (obj1, obj2) => {
+            this.scene.start("winScreen", my.sprite.player.collectibles);
+        });
         cursors = this.input.keyboard.createCursorKeys();
 
         this.rKey = this.input.keyboard.addKey('R');
+        this.zKey = this.input.keyboard.addKey('Z');
+        this.lKey = this.input.keyboard.addKey('L');
 
         // debug key listener (assigned to D key)
         this.input.keyboard.on('keydown-D', () => {
@@ -91,18 +108,7 @@ class Platformer extends Phaser.Scene {
             this.physics.world.debugGraphic.clear()
         }, this);
 
-        my.vfx.walking = this.add.particles(0, -2, "kenny-particles", {
-            frame: ['smoke_03.png', 'smoke_09.png'],
-            random: true,
-            scale: {start: 0.005, end: 0.01},
-            maxAliveParticles: 12,
-            lifespan: 100,
-            gravityY: 100,
-            alpha: {start: 1, end: 0.1}, 
-        });
-
-        my.vfx.walking.stop();
-        my.vfx.jumping = this.add.particles(0, 0, "kenny-particles", {
+        my.vfx.jumping = this.add.particles(-2, -2, "kenny-particles", {
             frame: ['slash_01.png', 'slash_02.png'],
             random: true,
             scale: {start: 0.01, end: 0.05},
@@ -118,41 +124,24 @@ class Platformer extends Phaser.Scene {
         this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
         this.cameras.main.startFollow(my.sprite.player, true, 0.25, 0.25); // (target, [,roundPixels][,lerpX][,lerpY])
         this.cameras.main.setDeadzone(40, 60);
-        this.cameras.main.setZoom(6);
+        this.cameras.main.setZoom(1);
     }
     update() {
         if(cursors.left.isDown) {
             my.sprite.player.setAccelerationX(-this.ACCELERATION);
             my.sprite.player.setFlip(true, false);
             my.sprite.player.anims.play('walk', true);
-            my.vfx.walking.startFollow(my.sprite.player, my.sprite.player.displayWidth/2-10, my.sprite.player.displayHeight/2-5, false);
-            my.vfx.walking.setParticleSpeed(this.PARTICLE_VELOCITY, 0);
 
-            if (my.sprite.player.body.blocked.down) {
-
-                my.vfx.walking.start();
-
-            }
 
         } else if(cursors.right.isDown) {
             my.sprite.player.setAccelerationX(this.ACCELERATION);
             my.sprite.player.resetFlip();
             my.sprite.player.anims.play('walk', true);
-            my.vfx.walking.startFollow(my.sprite.player, my.sprite.player.displayWidth/2-15, my.sprite.player.displayHeight/2-5, false);
-
-            my.vfx.walking.setParticleSpeed(this.PARTICLE_VELOCITY, 0);
-
-            if (my.sprite.player.body.blocked.down) {
-
-                my.vfx.walking.start();
-
-            }
         } else {
             // Set acceleration to 0 and have DRAG take over
             my.sprite.player.setAccelerationX(0);
             my.sprite.player.setDragX(this.DRAG);
             my.sprite.player.anims.play('idle');
-            my.vfx.walking.stop();
         }
 
         if(!my.sprite.player.body.blocked.down) {
@@ -165,6 +154,7 @@ class Platformer extends Phaser.Scene {
                 this.isJumping = true;
             }
         }
+        
         if(my.sprite.player.body.blocked.down && cursors.up.isUp && this.isJumping){
             const jumpTime = this.time.now - this.jumpStartTime; // Jump hold duration
             let jumpForce = jumpTime * .1;
@@ -174,6 +164,27 @@ class Platformer extends Phaser.Scene {
             this.sound.play('jumpAudio');
             my.vfx.jumping.startFollow(my.sprite.player, my.sprite.player.displayWidth/2-10, my.sprite.player.displayHeight/2-5, false);
             my.vfx.jumping.start();
+        }
+        this.input.on('pointerdown', (pointer) =>{
+           my.sprite.player.x = pointer.x;
+           my.sprite.player.y = pointer.y;
+        });
+        // Moving Platforms
+        if (this.movingPlatform1.x >= 145) {
+            this.movingPlatform1.body.velocity.x = -25;
+        } else if (this.movingPlatform1.x <= 72) {
+            this.movingPlatform1.body.velocity.x = 25;
+        }
+        if (this.movingPlatform2.y >= 402) {
+            this.movingPlatform2.body.velocity.y = -25;
+        } else if (this.movingPlatform2.y <= 342) {
+            this.movingPlatform2.body.velocity.y = 25;
+        }
+        if(Phaser.Input.Keyboard.JustDown(this.zKey)){
+            this.cameras.main.setZoom(6);
+        }
+        if(Phaser.Input.Keyboard.JustUp(this.zKey)){
+            this.cameras.main.setZoom(1);
         }
         if(Phaser.Input.Keyboard.JustDown(this.rKey)) {
             this.scene.restart();

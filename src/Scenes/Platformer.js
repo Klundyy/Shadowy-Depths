@@ -20,10 +20,10 @@ class Platformer extends Phaser.Scene {
     }
     preload(){
         this.load.scenePlugin('AnimatedTiles', './lib/AnimatedTiles.js', 'animatedTiles', 'animatedTiles');
+        
     }
 
     create() {
-        this.roomGen = false;
         this.map = this.add.tilemap("depths-level", 8, 8);
 
         // Tileset
@@ -94,13 +94,15 @@ class Platformer extends Phaser.Scene {
             this.signText = this.add.bitmapText(obj2.x, obj2.y + 12, "rocketSquare", "Press E", 8, 1).setOrigin(0.5).setScale(.5);
         });
         this.physics.add.overlap(my.sprite.player, this.flag, (obj1, obj2) => {
-            this.scene.start("winScreen", my.sprite.player.collectibles);
+            this.scene.start("winScreen");
         });
         cursors = this.input.keyboard.createCursorKeys();
 
         this.rKey = this.input.keyboard.addKey('R');
         this.zKey = this.input.keyboard.addKey('Z');
         this.lKey = this.input.keyboard.addKey('L');
+        this.eKey = this.input.keyboard.addKey('E');
+        this.escKey = this.input.keyboard.addKey('ESC');
 
         // debug key listener (assigned to D key)
         this.input.keyboard.on('keydown-D', () => {
@@ -119,14 +121,20 @@ class Platformer extends Phaser.Scene {
         });
 
         my.vfx.jumping.stop();
-        
 
+        //this.cameras.main.ignore(this.uiContainer);
         this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
         this.cameras.main.startFollow(my.sprite.player, true, 0.25, 0.25); // (target, [,roundPixels][,lerpX][,lerpY])
         this.cameras.main.setDeadzone(40, 60);
-        this.cameras.main.setZoom(1);
+        this.cameras.main.setZoom(6);
+        console.log(this.cameras.main.height);console.log(this.cameras.main.width);
     }
     update() {
+        // Calculate Player height
+        this.playerHeight = (892-my.sprite.player.y)/8;
+        this.playerHeight = (this.playerHeight > 100) ? 100: Math.trunc(this.playerHeight);
+        this.scene.launch("userInterface",this.playerHeight);
+        // Inputs
         if(cursors.left.isDown) {
             my.sprite.player.setAccelerationX(-this.ACCELERATION);
             my.sprite.player.setFlip(true, false);
@@ -143,7 +151,6 @@ class Platformer extends Phaser.Scene {
             my.sprite.player.setDragX(this.DRAG);
             my.sprite.player.anims.play('idle');
         }
-
         if(!my.sprite.player.body.blocked.down) {
             my.sprite.player.anims.play('jump');
             my.vfx.jumping.stop();
@@ -154,7 +161,7 @@ class Platformer extends Phaser.Scene {
                 this.isJumping = true;
             }
         }
-        
+        // Jump hold handling  
         if(my.sprite.player.body.blocked.down && cursors.up.isUp && this.isJumping){
             const jumpTime = this.time.now - this.jumpStartTime; // Jump hold duration
             let jumpForce = jumpTime * .1;
@@ -165,10 +172,7 @@ class Platformer extends Phaser.Scene {
             my.vfx.jumping.startFollow(my.sprite.player, my.sprite.player.displayWidth/2-10, my.sprite.player.displayHeight/2-5, false);
             my.vfx.jumping.start();
         }
-        this.input.on('pointerdown', (pointer) =>{
-           my.sprite.player.x = pointer.x;
-           my.sprite.player.y = pointer.y;
-        });
+        
         // Moving Platforms
         if (this.movingPlatform1.x >= 145) {
             this.movingPlatform1.body.velocity.x = -25;
@@ -180,11 +184,20 @@ class Platformer extends Phaser.Scene {
         } else if (this.movingPlatform2.y <= 342) {
             this.movingPlatform2.body.velocity.y = 25;
         }
+        // Testing
+        this.input.on('pointerdown', (pointer) =>{
+           my.sprite.player.x = pointer.x;
+           my.sprite.player.y = pointer.y;
+        });
         if(Phaser.Input.Keyboard.JustDown(this.zKey)){
             this.cameras.main.setZoom(6);
         }
         if(Phaser.Input.Keyboard.JustUp(this.zKey)){
             this.cameras.main.setZoom(1);
+        }
+        if(Phaser.Input.Keyboard.JustDown(this.escKey)) {
+            this.scene.launch("pauseMenu");
+            this.scene.pause("Platformer");
         }
         if(Phaser.Input.Keyboard.JustDown(this.rKey)) {
             this.scene.restart();

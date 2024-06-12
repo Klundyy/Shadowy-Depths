@@ -8,22 +8,28 @@
     ],
     "fileStates": {
         "": {
-            "scaleInDock": 3
+            "scaleInDock": 3,
+            "scaleInEditor": 3
         },
         "assets/depths-level.tmj": {
-            "scale": 2,
+            "expandedGroupLayers": [
+                4
+            ],
+            "scale": 0.75,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 68,
-                "y": 501
+                "x": 160,
+                "y": 280
             }
         },
         "assets/depths-level.tmj#tiles": {
             "scaleInDock": 2
         }
     },
+    "last.exportedFilePath": "C:/Users/derpk/CMPM120/Shadowy Depths/assets",
     "last.imagePath": "C:/Users/derpk/CMPM120/Shadowy Depths/assets",
     "map.height": 120,
+    "map.lastUsedExportFilter": "JSON map files (*.tmj *.json)",
     "map.lastUsedFormat": "json",
     "map.tileHeight": 8,
     "map.tileWidth": 8,
@@ -31,6 +37,7 @@
         "assets/depths-level.tmj"
     ],
     "project": "shadowy-depths-map.tiled-project",
+    "property.type": "bool",
     "recentFiles": [
         "assets/depths-level.tmj"
     ],

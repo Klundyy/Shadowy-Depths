@@ -10,22 +10,18 @@ class Load extends Phaser.Scene {
         // Load tilemap information
         this.load.image("tilemap_tiles", "tiles.png");                         // Packed tilemap
         this.load.tilemapTiledJSON("depths-level", "depths-level.tmj");   // Tilemap in JSON
-        //this.load.bitmapFont("rocketSquare", "KennyRocketSquare_0.png", "KennyRocketSquare.fnt");
+        this.load.bitmapFont("rocketSquare", "KennyRocketSquare_0.png", "KennyRocketSquare.fnt");
         // Load the tilemap as a spritesheet
         this.load.spritesheet("tilemap_sheet", "tiles.png", {
             frameWidth: 8,
             frameHeight: 8
         });
-        // Oooh, fancy. A multi atlas is a texture atlas which has the textures spread
-        // across multiple png files, so as to keep their size small for use with
-        // lower resource devices (like mobile phones).
-        // kenny-particles.json internally has a list of the png files
-        // The multiatlas was created using TexturePacker and the Kenny
+
         // Particle Pack asset pack.
-        // this.load.multiatlas("kenny-particles", "kenny-particles.json");
+        this.load.multiatlas("kenny-particles", "kenny-particles.json");
         // this.load.audio('coinAudio',['Collectibles_2.wav']);
         // this.load.audio('keyAudio',['Collectibles_6.wav']);
-        // this.load.audio('jumpAudio',['Bounce_3.wav']);
+        this.load.audio('jumpAudio',['Bounce_3.wav']);
         this.load.image('walk1','Player_Knight_walk_0.png');
         this.load.image('walk2','Player_Knight_walk_1.png');
         this.load.image('walk3','Player_Knight_walk_2.png');

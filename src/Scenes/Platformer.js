@@ -37,11 +37,10 @@ class Platformer extends Phaser.Scene {
         this.groundLayer.setCollisionByProperty({
             collides: true
         });
-
-        this.signs = this.map.createFromObjects("Objects", {
-            name: "sign",
+        this.dinos = this.map.createFromObjects("Objects", {
+            name: "dinos",
             key: "tilemap_sheet",
-            frame: 308
+            frame: 47
         });
         this.flag = this.map.createFromObjects("Objects", {
             name: "flag",
@@ -49,19 +48,17 @@ class Platformer extends Phaser.Scene {
             frame: 22
         })
         // Static Objects
-        this.physics.world.enable(this.signs, Phaser.Physics.Arcade.STATIC_BODY);
         this.physics.world.enable(this.flag, Phaser.Physics.Arcade.STATIC_BODY);
+        this.physics.world.enable(this.dinos, Phaser.Physics.Arcade.STATIC_BODY);
 
         // Object Groups
-        this.signGroup = this.add.group(this.signs);
-
+        this.dinoGroup = this.add.group(this.dinos);
         // Player Avatar
         my.sprite.player = this.physics.add.sprite(8, 880, "Player_Knight_idle_0.png").setScale(this.SCALE);
         my.sprite.player.setSize(8,8);
         my.sprite.player.setOffset(8,8);
         my.sprite.player.setCollideWorldBounds(true);
         my.sprite.player.setMaxVelocity(this.MAX_X_VEL, this.MAX_Y_VEL);
-        my.sprite.player.coins = 0;
         my.sprite.player.collectibles = 0;
         // Physics World Properties
         this.physics.world.setBounds(0,0,240,900);
@@ -90,11 +87,13 @@ class Platformer extends Phaser.Scene {
         this.movingPlatform2.body.velocity.y = 25;
         this.physics.add.collider(my.sprite.player, this.movingPlatform2);
         // Overlap Handling
-        this.physics.add.overlap(my.sprite.player, this.signGroup, (obj1, obj2) => {
-            this.signText = this.add.bitmapText(obj2.x, obj2.y + 12, "rocketSquare", "Press E", 8, 1).setOrigin(0.5).setScale(.5);
-        });
         this.physics.add.overlap(my.sprite.player, this.flag, (obj1, obj2) => {
-            this.scene.start("winScreen");
+            this.scene.start("winScreen",  my.sprite.player.collectibles);
+        });
+        this.physics.add.overlap(my.sprite.player, this.dinos, (obj1, obj2) => {
+            my.sprite.player.collectibles += 1;
+            this.sound.play('coinAudio');
+            obj2.destroy();
         });
         cursors = this.input.keyboard.createCursorKeys();
 

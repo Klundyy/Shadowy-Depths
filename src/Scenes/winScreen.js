@@ -10,9 +10,13 @@ class winScreen extends Phaser.Scene {
     }
     create(){
         let my = this.my;
-        let win = this.add.bitmapText(660, 350, "rocketSquare", "You Win");
-        let retry = this.add.bitmapText(580, 450, "rocketSquare", "Click to retry");
-        let highscore = this.add.bitmapText(450, 550,"rocketSquare", "You collected  " + this.collectibles + "/2 items");
+        this.escKey = this.input.keyboard.addKey('ESC');
+        this.cKey = this.input.keyboard.addKey('C');
+        this.add.image(200,200, 'walk1').setScale(30);
+        let win = this.add.bitmapText(660, 250, "rocketSquare", "You Win");
+        let retry = this.add.bitmapText(570, 350, "rocketSquare", "Click to retry");
+        let highscore = this.add.bitmapText(470, 550,"rocketSquare", "You collected  " + this.collectibles + "/3 dinos");
+        let credits = this.add.bitmapText(520, 450, "rocketSquare", "Press C for Credits");
     }
     update(){
         let my = this.my;
@@ -20,5 +24,13 @@ class winScreen extends Phaser.Scene {
             this.scene.start("Platformer");
         }
         )
+        if(Phaser.Input.Keyboard.JustDown(this.escKey)) {
+            this.scene.launch("titleScreen");
+            this.scene.stop();
+        }
+        if(Phaser.Input.Keyboard.JustDown(this.cKey)) {
+            this.scene.launch("creditScreen");
+            this.scene.stop();
+        }
     }
 }

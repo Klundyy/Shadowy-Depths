@@ -32,7 +32,7 @@ let config = {
     fps: 50,
     width: 1440,
     height: 900,
-    scene: [Load, Platformer, winScreen, pauseMenu,userInterface]
+    scene: [Load, Platformer, winScreen, pauseMenu,userInterface, creditScreen]
 }
 
 var cursors;

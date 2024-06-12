@@ -78,23 +78,26 @@ class Platformer extends Phaser.Scene {
         // Moving platforms setup
         this.movingPlatform1 = this.physics.add.sprite(88, 496, 'movingPlatform').setDisplaySize(16,16); // Set up sprite and size for moving platform
         this.movingPlatform1.body.setAllowGravity(false); // Platform can float
-        this.movingPlatform1.body.setImmovable(true);   // 
+        this.movingPlatform1.body.setImmovable(true);
         this.movingPlatform1.body.velocity.x = 25;
         this.physics.add.collider(my.sprite.player, this.movingPlatform1);
-        this.movingPlatform2 = this.physics.add.sprite(160, 352, 'movingPlatform').setDisplaySize(16,16); // Set up sprite and size for moving platform
-        this.movingPlatform2.body.setAllowGravity(false); // Platform can float
-        this.movingPlatform2.body.setImmovable(true);   // 
+        this.movingPlatform2 = this.physics.add.sprite(160, 352, 'movingPlatform').setDisplaySize(16,16);
+        this.movingPlatform2.body.setAllowGravity(false);
+        this.movingPlatform2.body.setImmovable(true);
         this.movingPlatform2.body.velocity.y = 25;
         this.physics.add.collider(my.sprite.player, this.movingPlatform2);
         // Overlap Handling
         this.physics.add.overlap(my.sprite.player, this.flag, (obj1, obj2) => {
             this.scene.start("winScreen",  my.sprite.player.collectibles);
+            this.scene.stop("userInterface");
+            this.scene.stop();
         });
         this.physics.add.overlap(my.sprite.player, this.dinos, (obj1, obj2) => {
             my.sprite.player.collectibles += 1;
             this.sound.play('coinAudio');
             obj2.destroy();
         });
+        // Input Definitions
         cursors = this.input.keyboard.createCursorKeys();
 
         this.rKey = this.input.keyboard.addKey('R');
@@ -103,12 +106,7 @@ class Platformer extends Phaser.Scene {
         this.eKey = this.input.keyboard.addKey('E');
         this.escKey = this.input.keyboard.addKey('ESC');
 
-        // debug key listener (assigned to D key)
-        this.input.keyboard.on('keydown-D', () => {
-            this.physics.world.drawDebug = this.physics.world.drawDebug ? false : true
-            this.physics.world.debugGraphic.clear()
-        }, this);
-
+        // Jump particles
         my.vfx.jumping = this.add.particles(-2, -2, "kenny-particles", {
             frame: ['slash_01.png', 'slash_02.png'],
             random: true,
@@ -118,10 +116,9 @@ class Platformer extends Phaser.Scene {
             gravityY: 100,
             alpha: {start: 1, end: 0.1}, 
         });
-
         my.vfx.jumping.stop();
 
-        //this.cameras.main.ignore(this.uiContainer);
+        // Camera setup
         this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
         this.cameras.main.startFollow(my.sprite.player, true, 0.25, 0.25); // (target, [,roundPixels][,lerpX][,lerpY])
         this.cameras.main.setDeadzone(40, 60);
@@ -183,17 +180,7 @@ class Platformer extends Phaser.Scene {
         } else if (this.movingPlatform2.y <= 342) {
             this.movingPlatform2.body.velocity.y = 25;
         }
-        // Testing
-        this.input.on('pointerdown', (pointer) =>{
-           my.sprite.player.x = pointer.x;
-           my.sprite.player.y = pointer.y;
-        });
-        if(Phaser.Input.Keyboard.JustDown(this.zKey)){
-            this.cameras.main.setZoom(6);
-        }
-        if(Phaser.Input.Keyboard.JustUp(this.zKey)){
-            this.cameras.main.setZoom(1);
-        }
+        // Pause and reset
         if(Phaser.Input.Keyboard.JustDown(this.escKey)) {
             this.scene.launch("pauseMenu");
             this.scene.pause("Platformer");

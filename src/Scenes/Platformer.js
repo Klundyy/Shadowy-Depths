@@ -16,7 +16,7 @@ class Platformer extends Phaser.Scene {
         this.jumpStartTime;
         this.isJumping;
         this.inGameTime = 0;
-        this.playerHeight;
+        this.playerHeight = 0;
     }
     preload(){
         this.load.scenePlugin('AnimatedTiles', './lib/AnimatedTiles.js', 'animatedTiles', 'animatedTiles');
@@ -127,13 +127,13 @@ class Platformer extends Phaser.Scene {
         this.cameras.main.startFollow(my.sprite.player, true, 0.25, 0.25); // (target, [,roundPixels][,lerpX][,lerpY])
         this.cameras.main.setDeadzone(40, 60);
         this.cameras.main.setZoom(6);
-        console.log(this.cameras.main.height);console.log(this.cameras.main.width);
+        this.scene.launch("userInterface",this.playerHeight);
     }
     update() {
-        // Calculate Player height
+        // Calculate Player height and update scene
         this.playerHeight = (892-my.sprite.player.y)/8;
         this.playerHeight = (this.playerHeight > 100) ? 100: Math.trunc(this.playerHeight);
-        this.scene.launch("userInterface",this.playerHeight);
+        this.events.emit('updateHeightCounter', this.playerHeight);
         // Inputs
         if(cursors.left.isDown) {
             my.sprite.player.setAccelerationX(-this.ACCELERATION);

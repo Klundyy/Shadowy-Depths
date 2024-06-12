@@ -8,10 +8,16 @@ class userInterface extends Phaser.Scene {
     preload(){
 
     }
-    create(){
-        this.heightCounter = this.add.text(10, 10, 'Height: 0', { fontSize: '16px', fill: '#fff' }).setScrollFactor(0).setScale(2);
+    create() {
+        // Create the height counter text
+        this.heightCounter = this.add.text(10, 10, 'Height: 0', { fontSize: '16px', fill: '#fff' });
+
+        // Listen for the height counter update event
+        this.scene.get('Platformer').events.on('updateHeightCounter', this.updateHeightCounter, this);
     }
-    update(){
-        this.heightCounter.setText('Height: ' + this.playerHeight);
+
+    updateHeightCounter(playerHeight) {
+        // Update the height counter text
+        this.heightCounter.setText('Height: ' + playerHeight);
     }
 }
